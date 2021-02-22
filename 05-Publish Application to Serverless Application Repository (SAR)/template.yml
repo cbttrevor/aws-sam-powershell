@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: DeleteCloudFormationPowerShell
+    Description: Deletes all CloudFormation stacks in the current AWS region.
+    Author: Trevor Sullivan
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: LICENSE.txt
+    ReadmeUrl: README.md
+    Labels: ['powershell']
+    HomePageUrl: https://github.com/pcgeek86
+    SemanticVersion: 0.0.2
+    SourceCodeUrl: https://github.com/pcgeek86
+Resources:
+  CleanupCloudFormation:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Handler: Basic::Basic.Bootstrap::ExecuteFunction
+      Runtime: dotnetcore3.1
+      CodeUri: delcfn.zip
+      MemorySize: 512
+      Timeout: 30
+      Role: !GetAtt [ "LambdaRole", "Arn" ]
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+            - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
